@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import type { BatchCreateParams } from "@anthropic-ai/sdk/resources/messages/batches.js";
+import type { BatchCreateParams } from "@anthropic-ai/sdk/resources/beta/messages/batches.js";
 import { getDb } from "../db/connection.js";
 import { config } from "../config.js";
 import { ANALYSIS_SYSTEM_PROMPT } from "./prompt.js";
@@ -49,10 +49,10 @@ export async function submitBatches(): Promise<string[]> {
               {
                 type: "image" as const,
                 source: {
-                  type: "file",
+                  type: "file" as const,
                   file_id: img.upload_file_id!,
                 },
-              } as any,  // file_id source is supported by the API but not yet typed in the non-beta SDK
+              },
               {
                 type: "text" as const,
                 text: "Please analyse this photograph.",
@@ -63,11 +63,30 @@ export async function submitBatches(): Promise<string[]> {
       },
     }));
 
+    const chunkNum = Math.floor(i / config.BATCH_SIZE) + 1;
     const anthropic = getClient();
-    const batch = await anthropic.messages.batches.create({ requests });
+
+    let batch;
+    try {
+      batch = await anthropic.beta.messages.batches.create({
+        requests,
+        betas: ["files-api-2025-04-14"],
+      });
+    } catch (err: any) {
+      const fileIds = chunk.slice(0, 3).map((img) => img.upload_file_id);
+      console.error(
+        `Failed to create batch (chunk ${chunkNum}, ${chunk.length} images)`
+      );
+      console.error(`  File IDs (first ${Math.min(3, chunk.length)}): ${fileIds.join(", ")}`);
+      console.error(`  Model: ${config.MODEL}`);
+      if (err.status) console.error(`  HTTP status: ${err.status}`);
+      if (err.error) console.error(`  API error:`, JSON.stringify(err.error, null, 2));
+      else console.error(`  Error:`, err.message ?? err);
+      throw err;
+    }
 
     console.log(
-      `Batch submitted: ${batch.id} (${chunk.length} images, chunk ${Math.floor(i / config.BATCH_SIZE) + 1})`
+      `Batch submitted: ${batch.id} (${chunk.length} images, chunk ${chunkNum})`
     );
 
     // Store batch_id against each image

@@ -75,8 +75,12 @@ Then open `http://localhost:3000` to browse the gallery.
 ### Utility Scripts
 
 ```bash
-npm run list-files   # List files uploaded to the Anthropic Files API
-npm run list-db      # List database contents with status summary
+npm run list-files     # List files uploaded to the Anthropic Files API
+npm run list-db        # List database contents with status summary
+npm run list-db -- -d  # Detailed view with all scores, captions, and keywords
+npm run list-batches   # List all batches from the Anthropic API with status
+npm run clear-db       # Delete all rows from the images table
+npm run clear-db -- --reset-analysis  # Clear analysis data only (keeps uploads)
 ```
 
 ### Type Checking
@@ -108,7 +112,9 @@ src/
 │   └── parser.ts      # Parse JSONL results into database
 ├── tools/             # Utility scripts
 │   ├── list-files.ts  # List Anthropic uploaded files
-│   └── list-db.ts     # List database contents
+│   ├── list-db.ts     # List database contents (supports --detail)
+│   ├── list-batches.ts # List Anthropic API batches with status
+│   └── clear-db.ts    # Clear database (supports --reset-analysis)
 └── web/               # Express web server
     ├── index.ts       # CLI entry point
     ├── server.ts      # Express app setup with EJS

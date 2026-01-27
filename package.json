@@ -8,7 +8,9 @@
     "bia": "tsx src/bia/index.ts",
     "web": "tsx src/web/index.ts",
     "list-files": "tsx src/tools/list-files.ts",
-    "list-db": "tsx src/tools/list-db.ts"
+    "list-db": "tsx src/tools/list-db.ts",
+    "list-batches": "tsx src/tools/list-batches.ts",
+    "clear-db": "tsx src/tools/clear-db.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",

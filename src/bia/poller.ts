@@ -32,17 +32,37 @@ export async function pollPendingBatches(): Promise<string[]> {
   const anthropic = getClient();
 
   for (const batchId of pendingBatchIds) {
-    let status = await anthropic.messages.batches.retrieve(batchId);
+    let status;
+    try {
+      status = await anthropic.beta.messages.batches.retrieve(batchId);
+    } catch (err: any) {
+      console.error(`Failed to retrieve batch ${batchId}:`);
+      if (err.status) console.error(`  HTTP status: ${err.status}`);
+      if (err.error) console.error(`  API error:`, JSON.stringify(err.error, null, 2));
+      else console.error(`  Error:`, err.message ?? err);
+      throw err;
+    }
 
     while (status.processing_status !== "ended") {
       console.log(
         `Batch ${batchId}: ${status.processing_status} — waiting ${config.POLL_INTERVAL_MS / 1000}s...`
       );
       await new Promise((r) => setTimeout(r, config.POLL_INTERVAL_MS));
-      status = await anthropic.messages.batches.retrieve(batchId);
+      try {
+        status = await anthropic.beta.messages.batches.retrieve(batchId);
+      } catch (err: any) {
+        console.error(`Failed to poll batch ${batchId}:`);
+        if (err.status) console.error(`  HTTP status: ${err.status}`);
+        if (err.error) console.error(`  API error:`, JSON.stringify(err.error, null, 2));
+        else console.error(`  Error:`, err.message ?? err);
+        throw err;
+      }
     }
 
-    console.log(`Batch ${batchId}: ended`);
+    const counts = status.request_counts;
+    console.log(
+      `Batch ${batchId}: ended — ${counts.succeeded} succeeded, ${counts.errored} errored, ${counts.expired} expired, ${counts.canceled} canceled`
+    );
     completedBatchIds.push(batchId);
   }
 

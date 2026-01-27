@@ -21,7 +21,11 @@ async function main() {
   console.log("Done.");
 }
 
-main().catch((err) => {
-  console.error("Fatal error:", err);
+main().catch((err: any) => {
+  console.error("Fatal error in Batch Image Analyser:");
+  if (err.status) console.error(`  HTTP status: ${err.status}`);
+  if (err.error) console.error(`  API error:`, JSON.stringify(err.error, null, 2));
+  if (err.message) console.error(`  Message: ${err.message}`);
+  if (!err.status && !err.error && !err.message) console.error(err);
   process.exit(1);
 });

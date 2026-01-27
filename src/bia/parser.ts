@@ -26,7 +26,16 @@ export async function parseResults(batchIds: string[]): Promise<void> {
     let successCount = 0;
     let errorCount = 0;
 
-    const results = await anthropic.messages.batches.results(batchId);
+    let results;
+    try {
+      results = await anthropic.beta.messages.batches.results(batchId);
+    } catch (err: any) {
+      console.error(`Failed to fetch results for batch ${batchId}:`);
+      if (err.status) console.error(`  HTTP status: ${err.status}`);
+      if (err.error) console.error(`  API error:`, JSON.stringify(err.error, null, 2));
+      else console.error(`  Error:`, err.message ?? err);
+      throw err;
+    }
 
     for await (const entry of results) {
       const customId = entry.custom_id;
@@ -49,11 +58,22 @@ export async function parseResults(batchIds: string[]): Promise<void> {
           }
         } catch (err) {
           errorCount++;
-          console.error(`  ✗ ${customId}: failed to parse result —`, err);
+          const content = entry.result.message.content[0];
+          const rawText = content.type === "text" ? content.text : JSON.stringify(content);
+          console.error(`  ✗ ${customId}: failed to parse result`);
+          console.error(`    Raw response: ${rawText.substring(0, 500)}`);
+          console.error(`    Parse error:`, err instanceof Error ? err.message : err);
         }
-      } else {
+      } else if (entry.result.type === "errored") {
         errorCount++;
-        console.error(`  ✗ ${customId}: result type=${entry.result.type}`);
+        const apiError = entry.result.error;
+        console.error(`  ✗ ${customId}: errored — ${apiError.error.type}: ${apiError.error.message}`);
+      } else if (entry.result.type === "expired") {
+        errorCount++;
+        console.error(`  ✗ ${customId}: expired (request was not processed before batch expiry)`);
+      } else if (entry.result.type === "canceled") {
+        errorCount++;
+        console.error(`  ✗ ${customId}: canceled`);
       }
     }
 
