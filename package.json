@@ -10,7 +10,8 @@
     "list-files": "tsx src/tools/list-files.ts",
     "list-db": "tsx src/tools/list-db.ts",
     "list-batches": "tsx src/tools/list-batches.ts",
-    "clear-db": "tsx src/tools/clear-db.ts"
+    "clear-db": "tsx src/tools/clear-db.ts",
+    "clear-files": "tsx src/tools/clear-files.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
