@@ -1,0 +1,64 @@
+<%- include('layout', { body: `
+<div class="detail-nav">
+  ${prevId ? `<a href="/image/${prevId}">&laquo; Previous</a>` : '<span></span>'}
+  <a href="/">Back to Gallery</a>
+  ${nextId ? `<a href="/image/${nextId}">Next &raquo;</a>` : '<span></span>'}
+</div>
+
+<div class="detail-container">
+  <div class="detail-image">
+    <img src="/photos/${encodeURIComponent(image.filename)}" alt="${image.filename}">
+  </div>
+
+  <div class="detail-sidebar">
+    <h2>${image.filename}</h2>
+
+    ${analysis ? `
+      <div class="scores">
+        <h3>Scores</h3>
+        ${['composition', 'lighting', 'color_and_tone', 'subject_storytelling', 'technical_execution', 'overall_impact'].map(key => `
+          <div class="score-row">
+            <span class="score-label">${key.replace(/_/g, ' ')}</span>
+            <div class="score-bar-bg">
+              <div class="score-bar score-bar-${analysis[key] >= 7 ? 'green' : analysis[key] >= 4 ? 'amber' : 'red'}" style="width: ${analysis[key] * 10}%"></div>
+            </div>
+            <span class="score-value">${analysis[key]}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="detail-section">
+        <h3>Comment</h3>
+        <p>${analysis.comment}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Caption</h3>
+        <p>${analysis.caption}</p>
+      </div>
+
+      <div class="detail-section">
+        <h3>Keywords</h3>
+        <div class="keywords">
+          ${analysis.keywords.map(kw => `<span class="keyword">${kw}</span>`).join('')}
+        </div>
+      </div>
+    ` : `
+      <div class="detail-section">
+        <p class="pending-text">Analysis not yet available.</p>
+      </div>
+    `}
+
+    <div class="detail-section">
+      <h3>Metadata</h3>
+      <table class="meta-table">
+        ${image.exif_camera ? `<tr><td>Camera</td><td>${image.exif_camera}</td></tr>` : ''}
+        ${image.exif_date_taken ? `<tr><td>Date taken</td><td>${image.exif_date_taken}</td></tr>` : ''}
+        ${image.width && image.height ? `<tr><td>Dimensions</td><td>${image.width} x ${image.height}</td></tr>` : ''}
+        ${image.file_size_bytes ? `<tr><td>File size</td><td>${(image.file_size_bytes / 1024 / 1024).toFixed(2)} MB</td></tr>` : ''}
+        ${image.exif_gps_lat && image.exif_gps_lon ? `<tr><td>GPS</td><td>${image.exif_gps_lat.toFixed(5)}, ${image.exif_gps_lon.toFixed(5)}</td></tr>` : ''}
+      </table>
+    </div>
+  </div>
+</div>
+` }) %>
