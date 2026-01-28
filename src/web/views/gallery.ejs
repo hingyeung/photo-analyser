@@ -1,40 +1,46 @@
-<%- include('layout', { body: `
+<%- include('header') %>
+
 <div class="gallery-header">
   <h1>Gallery</h1>
-  <p class="count">${totalCount} image${totalCount !== 1 ? 's' : ''}</p>
+  <p class="count"><%= totalCount %> image<%= totalCount !== 1 ? 's' : '' %></p>
   <div class="sort-controls">
     <label>Sort by:</label>
-    <a href="/?sort=created_at&order=desc" class="${sort === 'created_at' ? 'active' : ''}">Date added</a>
-    <a href="/?sort=filename&order=asc" class="${sort === 'filename' ? 'active' : ''}">Filename</a>
-    <a href="/?sort=overall_impact&order=desc" class="${sort === 'overall_impact' ? 'active' : ''}">Score</a>
+    <a href="/?sort=created_at&order=desc" class="<%= sort === 'created_at' ? 'active' : '' %>">Date added</a>
+    <a href="/?sort=filename&order=asc" class="<%= sort === 'filename' ? 'active' : '' %>">Filename</a>
+    <a href="/?sort=overall_impact&order=desc" class="<%= sort === 'overall_impact' ? 'active' : '' %>">Score</a>
   </div>
 </div>
 
 <div class="gallery-grid">
-  ${images.map(img => \`
-    <a href="/image/${img.id}" class="card">
+  <% images.forEach(function(img) { %>
+    <a href="/image/<%= img.id %>" class="card">
       <div class="card-image">
-        <img src="/photos/${encodeURIComponent(img.filename)}" alt="${img.filename}" loading="lazy">
+        <img src="/photos/<%= encodeURIComponent(img.filename) %>" alt="<%= img.filename %>" loading="lazy">
       </div>
       <div class="card-info">
-        <span class="card-filename">${img.filename}</span>
-        ${img.analysis ? \`
-          <span class="badge badge-\${img.analysis.overall_impact >= 7 ? 'green' : img.analysis.overall_impact >= 4 ? 'amber' : 'red'}">
-            ${img.analysis.overall_impact}/10
+        <span class="card-filename"><%= img.filename %></span>
+        <% if (img.analysis) { %>
+          <span class="badge badge-<%= img.analysis.overall_impact >= 7 ? 'green' : img.analysis.overall_impact >= 4 ? 'amber' : 'red' %>">
+            <%= img.analysis.overall_impact %>/10
           </span>
-        \` : \`
-          <span class="badge badge-grey">${img.upload_file_id ? 'Pending' : 'Not uploaded'}</span>
-        \`}
+        <% } else { %>
+          <span class="badge badge-grey"><%= img.upload_file_id ? 'Pending' : 'Not uploaded' %></span>
+        <% } %>
       </div>
     </a>
-  \`).join('')}
+  <% }); %>
 </div>
 
-${totalPages > 1 ? \`
+<% if (totalPages > 1) { %>
   <div class="pagination">
-    ${page > 1 ? \`<a href="/?page=${page - 1}&sort=${sort}&order=${order}">&laquo; Prev</a>\` : ''}
-    <span>Page ${page} of ${totalPages}</span>
-    ${page < totalPages ? \`<a href="/?page=${page + 1}&sort=${sort}&order=${order}">Next &raquo;</a>\` : ''}
+    <% if (page > 1) { %>
+      <a href="/?page=<%= page - 1 %>&sort=<%= sort %>&order=<%= order %>">&laquo; Prev</a>
+    <% } %>
+    <span>Page <%= page %> of <%= totalPages %></span>
+    <% if (page < totalPages) { %>
+      <a href="/?page=<%= page + 1 %>&sort=<%= sort %>&order=<%= order %>">Next &raquo;</a>
+    <% } %>
   </div>
-\` : ''}
-` }) %>
+<% } %>
+
+<%- include('footer') %>

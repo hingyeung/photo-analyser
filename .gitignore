@@ -5,3 +5,4 @@ data/
 *.db
 test_images/
 .DS_Store
+.playwright-mcp/
