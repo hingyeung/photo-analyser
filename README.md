@@ -81,6 +81,7 @@ npm run list-db -- -d  # Detailed view with all scores, captions, and keywords
 npm run list-batches   # List all batches from the Anthropic API with status
 npm run clear-db       # Delete all rows from the images table
 npm run clear-db -- --reset-analysis  # Clear analysis data only (keeps uploads)
+npm run clear-files    # Delete all files from the Anthropic Files API
 ```
 
 ### Type Checking
@@ -114,12 +115,13 @@ src/
 │   ├── list-files.ts  # List Anthropic uploaded files
 │   ├── list-db.ts     # List database contents (supports --detail)
 │   ├── list-batches.ts # List Anthropic API batches with status
-│   └── clear-db.ts    # Clear database (supports --reset-analysis)
+│   ├── clear-db.ts    # Clear database (supports --reset-analysis)
+│   └── clear-files.ts # Delete all files from Anthropic Files API
 └── web/               # Express web server
     ├── index.ts       # CLI entry point
     ├── server.ts      # Express app setup with EJS
     ├── routes.ts      # Gallery, detail, image serving, JSON API
-    └── views/         # EJS templates (layout, gallery, detail)
+    └── views/         # EJS templates (header, footer, gallery, detail)
 ```
 
 ## Tech Stack
