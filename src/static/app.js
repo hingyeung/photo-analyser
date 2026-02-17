@@ -85,7 +85,7 @@
   function renderAnalysis(analysis) {
     var scoreKeys = ['composition', 'lighting', 'color_and_tone', 'subject_storytelling', 'technical_execution', 'overall_impact'];
     var rows = scoreKeys.map(function (key) {
-      var val = analysis[key];
+      var val = Math.max(0, Math.min(10, Number(analysis[key]) || 0));
       var cls = val >= 7 ? 'green' : val >= 4 ? 'amber' : 'red';
       return '<div class="score-row">' +
         '<span class="score-label">' + key.replace(/_/g, ' ') + '</span>' +
@@ -161,7 +161,7 @@
   fetch('data/index.json')
     .then(function (res) { return res.json(); })
     .then(function (data) {
-      allImages = data.images;
+      allImages = (data && Array.isArray(data.images)) ? data.images : [];
       window.addEventListener('hashchange', handleHash);
       handleHash();
     })
