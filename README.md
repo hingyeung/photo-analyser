@@ -1,6 +1,6 @@
 # Photo Analyser
 
-Photograph quality analysis tool powered by Anthropic's Claude. Scores photos on six professional photography criteria, generates descriptive captions, and extracts keywords — all viewable through a server-rendered gallery UI.
+Photograph quality analysis tool powered by Anthropic's Claude. Scores photos on six professional photography criteria, generates descriptive captions, and extracts keywords — all viewable through a static gallery website.
 
 ## How It Works
 
@@ -8,7 +8,7 @@ The tool operates as a three-stage pipeline:
 
 1. **IMS** (Image Metadata Synchroniser) — Scans a local directory, extracts EXIF metadata, resizes images for cost efficiency, and uploads them to the Anthropic Files API.
 2. **BIA** (Batch Image Analyser) — Submits uploaded images to the Anthropic Message Batches API for AI analysis, polls for completion, and stores the parsed results.
-3. **Web** — Serves a gallery UI with pagination, sorting, and detailed per-image views including scores, captions, keywords, and metadata.
+3. **Export** — Generates a self-contained static website in `dist/` with a gallery, sorting, and detailed per-image views including scores, captions, keywords, and metadata.
 
 Each module is independent, idempotent, and safe to re-run.
 
@@ -53,7 +53,6 @@ cp .env.example .env
 | `MODEL` | No | `claude-sonnet-4-5-20250929` | Anthropic model to use for analysis |
 | `BATCH_SIZE` | No | `50` | Number of images per batch submission |
 | `POLL_INTERVAL_MS` | No | `30000` | Milliseconds between batch status polls |
-| `WEB_PORT` | No | `3000` | Port for the web UI |
 
 ## Usage
 
@@ -66,11 +65,16 @@ npm run ims
 # 2. Submit uploaded images for batch analysis and wait for results
 npm run bia
 
-# 3. Start the web UI
-npm run web
+# 3. Generate the static site
+npm run export
+
+# 4. Serve and open locally
+npx serve dist
 ```
 
-Then open `http://localhost:3000` to browse the gallery.
+Then open the URL shown by `serve` (typically `http://localhost:3000`) to browse the gallery.
+
+> **Note:** Open via a local server, not directly as a `file://` URL — browsers block `fetch()` on `file://` URLs.
 
 ### Utility Scripts
 
@@ -117,11 +121,14 @@ src/
 │   ├── list-batches.ts # List Anthropic API batches with status
 │   ├── clear-db.ts    # Clear database (supports --reset-analysis)
 │   └── clear-files.ts # Delete all files from Anthropic Files API
-└── web/               # Express web server
-    ├── index.ts       # CLI entry point
-    ├── server.ts      # Express app setup with EJS
-    ├── routes.ts      # Gallery, detail, image serving, JSON API
-    └── views/         # EJS templates (header, footer, gallery, detail)
+├── export/            # Static Site Exporter
+│   ├── index.ts       # CLI entry point / orchestrator
+│   └── writer.ts      # JSON sidecar writing, file copying
+└── static/            # Browser-side SPA source files
+    ├── index.html     # SPA shell
+    ├── app.js         # Vanilla JS SPA
+    └── css/
+        └── styles.css # Stylesheet
 ```
 
 ## Tech Stack
@@ -130,17 +137,16 @@ src/
 - **SQLite** via `better-sqlite3` — synchronous, WAL mode, single `images` table
 - **sharp** — image resizing to reduce API costs
 - **ExifReader** — EXIF metadata extraction (camera, date, GPS)
-- **Express + EJS** — server-rendered gallery with dark theme
+- **Vanilla JS SPA** — static gallery with dark theme, hash-based routing, no framework
 - **Anthropic SDK** — Files API (beta) for uploads, Message Batches API for analysis
 
-## Web UI
+## Gallery
 
-The gallery supports:
+The static site supports:
 
-- **Sorting** by date added, filename, or overall impact score
-- **Pagination** (24 images per page)
+- **Sorting** by date added, filename, or overall impact score (client-side)
 - **Detail view** with colour-coded score bars, caption, keywords, and EXIF metadata
-- **JSON API** at `GET /api/images` for external integrations
+- **Hash-based routing** (`#/` for gallery, `#/image/<filename>` for detail)
 - **Dark theme** with responsive layout
 
 ## Design Decisions
