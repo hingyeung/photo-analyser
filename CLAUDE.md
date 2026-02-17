@@ -8,7 +8,7 @@ Photograph quality analysis tool using Anthropic LLM. Scores photos on professio
 - **Runtime:** Node.js via `tsx` (no pre-compilation step)
 - **Database:** SQLite via `better-sqlite3` (synchronous)
 - **Image processing:** `sharp` (resizing), `exifreader` (EXIF extraction)
-- **Frontend:** Express + EJS server-rendered templates
+- **Frontend:** Vanilla JS single-page app (static, no framework)
 - **AI:** Anthropic SDK (`@anthropic-ai/sdk`) — Files API (beta), Message Batches API, Vision
 
 ## Architecture
@@ -17,7 +17,7 @@ Three independent CLI modules:
 
 - **IMS** (`npm run ims`) — Image Metadata Synchroniser: scans `IMAGE_DIR`, extracts EXIF, resizes to ≤800×800 JPEG, uploads to Anthropic Files API, stores metadata in SQLite
 - **BIA** (`npm run bia`) — Batch Image Analyser: submits uploaded images to Anthropic Message Batches API, polls for completion, parses results into DB
-- **Web** (`npm run web`) — Express server at `localhost:3000` showing gallery and detail views
+- **Export** (`npm run export`) — Static Site Exporter: reads SQLite, writes JSON sidecars + gallery manifest, copies images, emits a self-contained `dist/` directory
 
 ## Project Structure
 
@@ -43,11 +43,14 @@ src/
 ├── tools/             # Utility scripts
 │   ├── list-files.ts  # list files uploaded to Anthropic
 │   └── list-db.ts     # list images table contents
-└── web/               # Frontend
-    ├── index.ts       # CLI entry point
-    ├── server.ts      # Express app setup
-    ├── routes.ts      # gallery, detail, image serving, JSON API
-    └── views/         # EJS templates (layout, gallery, detail)
+├── export/            # Static Site Exporter
+│   ├── index.ts       # CLI entry point / orchestrator
+│   └── writer.ts      # JSON sidecar writing, file copying
+└── static/            # Browser-side SPA source files
+    ├── index.html     # SPA shell
+    ├── app.js         # Vanilla JS SPA
+    └── css/
+        └── styles.css # Stylesheet
 ```
 
 ## Database
@@ -63,7 +66,7 @@ All config via `.env` file (see `.env.example`). Required: `ANTHROPIC_API_KEY`, 
 ```bash
 npm run ims          # Sync images from IMAGE_DIR → DB + Anthropic Files API
 npm run bia          # Submit unprocessed images for batch analysis
-npm run web          # Start web UI on localhost:3000
+npm run export       # Generate dist/ static site from database
 npm run list-files   # List files uploaded to Anthropic Files API
 npm run list-db      # List images table contents with status summary
 npx tsc --noEmit     # Type-check
