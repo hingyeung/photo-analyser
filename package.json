@@ -6,7 +6,7 @@
   "scripts": {
     "ims": "tsx src/ims/index.ts",
     "bia": "tsx src/bia/index.ts",
-    "web": "tsx src/web/index.ts",
+    "export": "tsx src/export/index.ts",
     "list-files": "tsx src/tools/list-files.ts",
     "list-db": "tsx src/tools/list-db.ts",
     "list-batches": "tsx src/tools/list-batches.ts",
