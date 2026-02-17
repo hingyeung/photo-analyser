@@ -16,6 +16,5 @@ export const config = {
   MODEL: process.env.MODEL || "claude-sonnet-4-5-20250929",
   BATCH_SIZE: parseInt(process.env.BATCH_SIZE || "50", 10),
   POLL_INTERVAL_MS: parseInt(process.env.POLL_INTERVAL_MS || "30000", 10),
-  WEB_PORT: parseInt(process.env.WEB_PORT || "3000", 10),
   IMAGE_EXTENSIONS: [".jpg", ".jpeg", ".png", ".webp", ".gif"],
 } as const;
