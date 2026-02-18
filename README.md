@@ -158,4 +158,4 @@ The static site supports:
 
 ## Licence
 
-ISC
+MIT
