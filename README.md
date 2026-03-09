@@ -1,5 +1,8 @@
 # Photo Analyser
 
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
+![Node.js: v18+](https://img.shields.io/badge/Node.js-v18%2B-green.svg)
+
 Photograph quality analysis tool powered by Anthropic's Claude. Scores photos on six professional photography criteria, generates descriptive captions, and extracts keywords — all viewable through a static gallery website.
 
 ## How It Works
@@ -74,7 +77,8 @@ npx serve dist
 
 Then open the URL shown by `serve` (typically `http://localhost:3000`) to browse the gallery.
 
-> **Note:** Open via a local server, not directly as a `file://` URL — browsers block `fetch()` on `file://` URLs.
+> [!WARNING]
+> Always open the gallery via a local server (`npx serve dist`), not by opening `index.html` directly in a browser. Browsers block `fetch()` on `file://` URLs, so the gallery will not load without a server.
 
 ### Utility Scripts
 
@@ -141,6 +145,8 @@ src/
 - **Anthropic SDK** — Files API (beta) for uploads, Message Batches API for analysis
 
 ## Gallery
+
+Running `npm run export` produces a self-contained `dist/` directory. Serve it with `npx serve dist` to get a dark-themed photo gallery where you can browse all analysed images, sort by score or date, and click through to a detail view showing colour-coded score bars, the AI-generated caption, keywords, and EXIF metadata (camera, lens, settings, location).
 
 The static site supports:
 

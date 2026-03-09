@@ -2,6 +2,7 @@
   "name": "photo-analyser",
   "version": "1.0.0",
   "description": "Photograph quality analyser using Anthropic LLM",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "ims": "tsx src/ims/index.ts",
