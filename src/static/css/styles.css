@@ -197,6 +197,8 @@ main {
 
 .detail-image img {
   width: 100%;
+  max-height: calc(100vh - 160px);
+  object-fit: contain;
   border-radius: 8px;
 }
 
