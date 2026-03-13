@@ -148,6 +148,10 @@ src/
 
 Running `npm run export` produces a self-contained `dist/` directory. Serve it with `npx serve dist` to get a dark-themed photo gallery where you can browse all analysed images, sort by score or date, and click through to a detail view showing colour-coded score bars, the AI-generated caption, keywords, and EXIF metadata (camera, lens, settings, location).
 
+![Gallery view](docs/assets/gallery.png)
+
+![Image detail view](docs/assets/image_details.png)
+
 The static site supports:
 
 - **Sorting** by date added, filename, or overall impact score (client-side)
